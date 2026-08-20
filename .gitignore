@@ -1,0 +1,27 @@
+# Virtual Environment
+.venv/
+.env
+
+# Database
+db.sqlite3
+
+# Python
+*.pyc
+__pycache__/
+*.log
+*.pot
+
+# IDE
+.idea/
+.vscode/
+
+# Migrations
+*/migrations/
+!**/migrations/__init__.py
+
+# Static & test artifacts
+staticfiles/
+test_files/
+
+# Data dumps
+datadump.json

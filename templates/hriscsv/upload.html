@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload HRIS CSV - Diversio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .upload-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .upload-header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .upload-header p {
+            font-size: 14px;
+            color: #a0a0b0;
+            margin-bottom: 30px;
+        }
+
+        .file-drop-area {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 150px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .file-drop-area:hover, .file-drop-area.is-active {
+            border-color: #6c5ce7;
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .file-msg {
+            color: #d0d0e0;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #6c5ce7;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.1s ease;
+        }
+
+        .btn-submit:hover {
+            background: #5b4bc4;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .logout-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #a0a0b0;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .logout-link:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="upload-container">
+    <div class="upload-header">
+        <h1>Upload HRIS Data</h1>
+        <p>Please upload your HRIS CSV file to continue</p>
+    </div>
+
+    {% if error %}
+        <div style="color: #ff7675; font-size: 14px; margin-bottom: 20px; text-align: center;">
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="file-drop-area" id="drop-area">
+            <span class="file-msg" id="file-msg">Choose a CSV file or drag it here</span>
+            <input class="file-input" type="file" name="hris_csv" accept=".csv" required id="file-input">
+        </div>
+        <button type="submit" class="btn-submit">Upload Data</button>
+    </form>
+
+    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" style="background: none; border: none; color: #a0a0b0; text-decoration: underline; font-size: 14px; cursor: pointer; margin-top: 25px;">Logout</button>
+    </form>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const fileMsg = document.getElementById('file-msg');
+    const dropArea = document.getElementById('drop-area');
+
+    fileInput.addEventListener('change', function(e) {
+        if (fileInput.files.length > 0) {
+            fileMsg.textContent = fileInput.files[0].name;
+        } else {
+            fileMsg.textContent = 'Choose a CSV file or drag it here';
+        }
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false)
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.add('is-active'), false)
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.remove('is-active'), false)
+    });
+</script>
+
+</body>
+</html>
