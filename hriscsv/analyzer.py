@@ -22,26 +22,21 @@ EXPECTED_COLUMNS = {
 
 def analyze(csv_text: str) -> dict:
     """
-    Analyze raw CSV text and return a results dictionary.
-
     Parameters
-    ----------
     csv_text : str
         The full contents of the uploaded CSV file as a UTF-8 string.
 
     Returns
-    -------
     dict with keys:
         total_rows, accepted_count, errors, root_employees,
         managers, cycle_participants
     """
     reader = csv.DictReader(io.StringIO(csv_text))
 
-    # ── Normalise header names ──────────────────────────────────────────
     if reader.fieldnames:
         reader.fieldnames = [h.strip().lower() for h in reader.fieldnames]
+     # Employee_ID - > emplyee_id
 
-    # ── First pass: parse rows, strip cells, assign source row numbers ──
     raw_rows = []
     for i, row in enumerate(reader, start=2):  # row 1 = header
         cleaned = {k.strip(): (v.strip() if v else "") for k, v in row.items()}
@@ -53,7 +48,6 @@ def analyze(csv_text: str) -> dict:
     seen_ids: set[str] = set()
     accepted: list[dict] = []
 
-    # ── Second pass: row-level validation ───────────────────────────────
     for row in raw_rows:
         eid = row.get("employee_id", "")
         ename = row.get("employee_name", "")
@@ -115,8 +109,9 @@ def analyze(csv_text: str) -> dict:
         eid = row["employee_id"]
         if eid not in emp_by_id:
             emp_by_id[eid] = row
+ # E001 -> empa's Information
 
-    # ── Dangling manager_id check (needs full id set) ───────────────────
+    # Dangling manager_id check (needs full id set)
     for row in accepted:
         mid = row.get("manager_id", "")
         if mid and mid not in emp_by_id:
@@ -130,7 +125,7 @@ def analyze(csv_text: str) -> dict:
     # Sort errors by source row number for consistent display
     errors.sort(key=lambda e: e["row"])
 
-    # ── Root employees (no manager) ─────────────────────────────────────
+    # Root employees (no manager) 
     root_employees = [
         {
             "employee_id": r["employee_id"],
@@ -141,7 +136,7 @@ def analyze(csv_text: str) -> dict:
         if not r.get("manager_id", "")
     ]
 
-    # ── Manager direct-report counts ────────────────────────────────────
+    # Manager direct-report counts 
     report_counts: dict[str, int] = {}
     for row in accepted:
         mid = row.get("manager_id", "")
@@ -161,7 +156,7 @@ def analyze(csv_text: str) -> dict:
         reverse=True,
     )
 
-    # ── Cycle detection ─────────────────────────────────────────────────
+    # Cycle detection
     cycle_ids: set[str] = set()
     for eid in emp_by_id:
         visited: set[str] = set()

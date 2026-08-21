@@ -37,7 +37,7 @@ A Django web application that lets authenticated users upload an HRIS (Human Res
 ### 1. Clone & set up the virtual environment
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Doomster13/Diversio-_assignment
 cd Diversio
 python -m venv .venv
 
